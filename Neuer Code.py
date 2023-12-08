@@ -1,51 +1,34 @@
 import tkinter as tk
+from tkinter import ttk
 
 class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.current_frame = None  # Aktuell angezeigtes Frame
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(padx=10, pady=10)
 
-        self.home_page()
+        self.create_kompressor_ipt_page()
+        self.create_kompressor_ostfalia_page()
 
-    def home_page(self):
-        if self.current_frame:
-            self.current_frame.destroy()
+    def create_kompressor_ipt_page(self):
+        kompressor_ipt_frame = tk.Frame(self.notebook)
+        self.notebook.add(kompressor_ipt_frame, text="Kompressor IPT")
 
-        self.current_frame = tk.Frame(self)
-        self.current_frame.pack()
+        tk.Button(kompressor_ipt_frame, text="Status Sensoren").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Energieverbrauch").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Temperaturen").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Messwerte").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Systemdruck").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Historische Daten").pack(pady=5, padx=10, side=tk.LEFT)
 
-        tk.Button(self.current_frame, text="Kompressor IPT", command=self.kompressor_ipt_page).pack()
-        tk.Button(self.current_frame, text="Kompressor Ostfalia", command=self.kompressor_ostfalia_page).pack()
+    def create_kompressor_ostfalia_page(self):
+        kompressor_ostfalia_frame = tk.Frame(self.notebook)
+        self.notebook.add(kompressor_ostfalia_frame, text="Kompressor Ostfalia")
 
-    def kompressor_ipt_page(self):
-        if self.current_frame:
-            self.current_frame.destroy()
-
-        self.current_frame = tk.Frame(self)
-        self.current_frame.pack()
-
-        tk.Button(self.current_frame, text="Status Sensoren").pack()
-        tk.Button(self.current_frame, text="Energieverbrauch").pack()
-        tk.Button(self.current_frame, text="Temperaturen").pack()
-        tk.Button(self.current_frame, text="Messwerte").pack()
-        tk.Button(self.current_frame, text="Systemdruck").pack()
-        tk.Button(self.current_frame, text="Historische Daten").pack()
-
-        tk.Button(self.current_frame, text="Zurück", command=self.home_page).pack()
-
-    def kompressor_ostfalia_page(self):
-        if self.current_frame:
-            self.current_frame.destroy()
-
-        self.current_frame = tk.Frame(self)
-        self.current_frame.pack()
-
-        tk.Button(self.current_frame, text="Energieverbräuche").pack()
-        tk.Button(self.current_frame, text="Messwerte").pack()
-        tk.Button(self.current_frame, text="Historische Daten").pack()
-
-        tk.Button(self.current_frame, text="Zurück", command=self.home_page).pack()
+        tk.Button(kompressor_ostfalia_frame, text="Energieverbräuche").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Messwerte").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Historische Daten").pack(pady=5, padx=10, side=tk.LEFT)
 
 if __name__ == "__main__":
     app = MainApp()
