@@ -1,0 +1,34 @@
+Index: GUI/Daten.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pytest\nfrom unittest.mock import MagicMock\n\n# Beispielstruktur der Daten basierend auf den Informationen aus dem Bild\nbeispiel_kompressor_daten = {\n    \"Kompressor_IPT\": {\n        \"ID\": \"12205254\",\n        \"Zeitstempel\": \"2023-11-10 11:56:27.410\",\n        \"Zeitstempel_Unix_ms\": \"1699613787410\",\n        \"Strom_gesamt\": \"0.029684464090384603\",\n        \"Spannung_gesamt\": \"399.5476327691272\",\n        \"Wirkleistung_gesamt\": \"6.64837087403566\",\n        \"Blindleistung_gesamt\": \"0\",\n        \"Energie_gesamt_kwh\": \"18988.191285\",\n        \"CosPhi_gesamt\": \"0.3333333333333333\",\n        \"Frequenz_gesamt\": \"50.0\",\n        \"Temperatur1\": \"23.898\",\n        \"Temperatur2\": \"137.2\",\n        \"Druck\": \"0.74412\",\n        \"Durchfluss\": \"132.202\"\n        # Weitere Schlüssel-Werte hier hinzufügen, falls nötig\n    }\n}\n\n# Funktion, die wir testen wollen, könnte so aussehen\ndef hole_kompressor_daten():\n    # Diese Funktion würde normalerweise die Daten von einem externen Server abrufen\n    pass\n\n@pytest.fixture\ndef mock_kompressor_daten(monkeypatch):\n    # Erstellen eines MagicMock-Objekts, das die simulierten Kompressordaten zurückgibt\n    mock_datenquelle = MagicMock(return_value=beispiel_kompressor_daten)\n    # Ersetzen der echten Funktion, die Daten abruft, durch den MagicMock\n    monkeypatch.setattr('Daten.hole_kompressor_daten', mock_datenquelle)\n    return mock_datenquelle  # Wir geben das Mock-Objekt zurück für die Verwendung im Test\n\ndef test_hole_kompressor_daten(mock_kompressor_daten):\n    # Hier rufen wir die Funktion auf, die jetzt durch MagicMock simuliert wird\n    daten = hole_kompressor_daten()\n    # Wir überprüfen, ob die zurückgegebenen Daten unseren simulierten Daten entsprechen\n    assert daten == beispiel_kompressor_daten\n
+===================================================================
+diff --git a/GUI/Daten.py b/GUI/Daten.py
+--- a/GUI/Daten.py	
++++ b/GUI/Daten.py	
+@@ -22,18 +22,23 @@
+     }
+ }
+ 
++
+ # Funktion, die wir testen wollen, könnte so aussehen
+ def hole_kompressor_daten():
+     # Diese Funktion würde normalerweise die Daten von einem externen Server abrufen
+     pass
+ 
++
+ @pytest.fixture
+ def mock_kompressor_daten(monkeypatch):
+     # Erstellen eines MagicMock-Objekts, das die simulierten Kompressordaten zurückgibt
+     mock_datenquelle = MagicMock(return_value=beispiel_kompressor_daten)
+     # Ersetzen der echten Funktion, die Daten abruft, durch den MagicMock
+-    monkeypatch.setattr('Daten.hole_kompressor_daten', mock_datenquelle)
+-    return mock_datenquelle  # Wir geben das Mock-Objekt zurück für die Verwendung im Test
++    monkeypatch.setattr("Daten.hole_kompressor_daten", mock_datenquelle)
++    return (
++        mock_datenquelle  # Wir geben das Mock-Objekt zurück für die Verwendung im Test
++    )
++
+ 
+ def test_hole_kompressor_daten(mock_kompressor_daten):
+     # Hier rufen wir die Funktion auf, die jetzt durch MagicMock simuliert wird
