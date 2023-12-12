@@ -40,3 +40,41 @@ def test_hole_kompressor_daten(mock_kompressor_daten):
     daten = hole_kompressor_daten()
     # Wir überprüfen, ob die zurückgegebenen Daten unseren simulierten Daten entsprechen
     assert daten == beispiel_kompressor_daten
+
+
+import tkinter as tk
+
+# Vorhandene Beispielstruktur der Daten
+beispiel_kompressor_daten = {
+    "Kompressor_IPT_1": {
+        "ID": "12205254",
+        "Zeitstempel": "2023-11-10 11:56:27.410",
+        # Weitere Daten...
+    },
+    "Kompressor_IPT_2": {
+        "ID": "12205255",
+        "Zeitstempel": "2023-11-11 12:10:00.123",
+        # Weitere Daten...
+    }
+    # Weitere Kompressoren können hier hinzugefügt werden
+}
+
+
+def zeige_details(kompressor_id):
+    details_window = tk.Toplevel()
+    details_window.title(f"Details für {kompressor_id}")
+
+    daten = beispiel_kompressor_daten[kompressor_id]
+    for key, value in daten.items():
+        tk.Label(details_window, text=f"{key}: {value}").pack()
+
+
+# Hauptfenster Setup
+root = tk.Tk()
+root.title("Kompressor Auswahl")
+
+for kompressor_id in beispiel_kompressor_daten:
+    button = tk.Button(root, text=kompressor_id, command=lambda id=kompressor_id: zeige_details(id))
+    button.pack()
+
+root.mainloop()
