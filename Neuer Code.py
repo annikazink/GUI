@@ -23,13 +23,49 @@ class MainApp(tk.Tk):
         self.create_kompressor_ipt_buttons(kompressor_ipt_frame)
         self.create_kompressor_ostfalia_buttons(kompressor_ostfalia_frame)
 
+        # Frame für Sensorstatus in der Mitte des Bildschirms
+        self.sensor_status_frame = tk.Frame(self)
+        self.sensor_status_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        # Labels für die Sensorwerte
+        self.sensor_labels = {
+            "Druck": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Durchfluss": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Temperatur 1": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Temperatur 2": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12))
+        }
+
+        # Platzierung der Sensorlabels
+        for idx, (key, label) in enumerate(self.sensor_labels.items()):
+            label.pack(padx=10, pady=5, anchor=tk.W)
+
     def create_kompressor_ipt_buttons(self, frame):
-        tk.Button(frame, text="Status Sensoren", font=("Arial", 12), width=20, height=3).grid(row=0, column=0, padx=10, pady=5)
-        tk.Button(frame, text="Energieverbrauch", font=("Arial", 12), width=20, height=3).grid(row=0, column=1, padx=10, pady=5)
-        tk.Button(frame, text="Temperaturen", font=("Arial", 12), width=20, height=3).grid(row=0, column=2, padx=10, pady=5)
-        tk.Button(frame, text="Messwerte", font=("Arial", 12), width=20, height=3).grid(row=0, column=3, padx=10, pady=5)
-        tk.Button(frame, text="Systemdruck", font=("Arial", 12), width=20, height=3).grid(row=0, column=4, padx=10, pady=5)
-        tk.Button(frame, text="Historische Daten", font=("Arial", 12), width=20, height=3).grid(row=0, column=5, padx=10, pady=5)
+        def show_sensor_status():
+            # Hier sollen die Daten aus der Datenbank abgerufen werden
+            # Beispiel: Annahme, dass die Daten in einer Liste sind
+            sensor_data = {
+                "Druck": "0.74412 PSI",
+                "Durchfluss": "132.202 L/min",
+                "Temperatur 1": "23.898°C",
+                "Temperatur 2": "137.2°C"
+            }
+
+            # Zeige die Sensordaten in Labels an
+            for key, value in sensor_data.items():
+                self.sensor_labels[key]["text"] = f"{key}: {value}"
+
+        def reset_sensor_status():
+            # Setze die Labels zurück
+            for key in self.sensor_labels:
+                self.sensor_labels[key]["text"] = ""
+
+        tk.Button(frame, text="Status Sensoren", font=("Arial", 12), width=20, height=3, command=show_sensor_status).grid(row=0, column=5, padx=10, pady=5)
+        tk.Button(frame, text="Energieverbrauch", font=("Arial", 12), width=20, height=3, command=reset_sensor_status).grid(row=0, column=0, padx=10, pady=5)
+        tk.Button(frame, text="Temperaturen", font=("Arial", 12), width=20, height=3, command=reset_sensor_status).grid(row=0, column=1, padx=10, pady=5)
+        tk.Button(frame, text="Messwerte", font=("Arial", 12), width=20, height=3, command=reset_sensor_status).grid(row=0, column=2, padx=10, pady=5)
+        tk.Button(frame, text="Systemdruck", font=("Arial", 12), width=20, height=3, command=reset_sensor_status).grid(row=0, column=3, padx=10, pady=5)
+        tk.Button(frame, text="Historische Daten", font=("Arial", 12), width=20, height=3, command=reset_sensor_status).grid(row=0, column=4, padx=10, pady=5)
+
 
     def create_kompressor_ostfalia_buttons(self, frame):
         tk.Button(frame, text="Energieverbräuche", font=("Arial", 12), width=20, height=3).grid(row=0, column=0, padx=10, pady=5)
