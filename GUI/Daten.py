@@ -1,80 +1,42 @@
-import pytest
-from unittest.mock import MagicMock
+import random
+from datetime import datetime, timedelta
 
-# Beispielstruktur der Daten basierend auf den Informationen aus dem Bild
-beispiel_kompressor_daten = {
-    "Kompressor_IPT": {
-        "ID": "12205254",
-        "Zeitstempel": "2023-11-10 11:56:27.410",
-        "Zeitstempel_Unix_ms": "1699613787410",
-        "Strom_gesamt": "0.029684464090384603",
-        "Spannung_gesamt": "399.5476327691272",
-        "Wirkleistung_gesamt": "6.64837087403566",
-        "Blindleistung_gesamt": "0",
-        "Energie_gesamt_kwh": "18988.191285",
-        "CosPhi_gesamt": "0.3333333333333333",
-        "Frequenz_gesamt": "50.0",
-        "Temperatur1": "23.898",
-        "Temperatur2": "137.2",
-        "Druck": "0.74412",
-        "Durchfluss": "132.202"
-        # Weitere Schlüssel-Werte hier hinzufügen, falls nötig
-    }
-}
+def generiere_zufaellige_kompressor_daten(kompressor_id, startzeit, intervall_in_minuten=15):
+    daten_liste = []
+    aktuelle_zeit = startzeit
 
-# Funktion, die wir testen wollen, könnte so aussehen
-def hole_kompressor_daten():
-    # Diese Funktion würde normalerweise die Daten von einem externen Server abrufen
-    pass
+    intervall = timedelta(minutes=intervall_in_minuten)
+    anzahl_datensaetze = int(7 * 24 * 60 / intervall_in_minuten)  # Anzahl der Datenpunkte für 7 Tage
 
-@pytest.fixture
-def mock_kompressor_daten(monkeypatch):
-    # Erstellen eines MagicMock-Objekts, das die simulierten Kompressordaten zurückgibt
-    mock_datenquelle = MagicMock(return_value=beispiel_kompressor_daten)
-    # Ersetzen der echten Funktion, die Daten abruft, durch den MagicMock
-    monkeypatch.setattr('Daten.hole_kompressor_daten', mock_datenquelle)
-    return mock_datenquelle  # Wir geben das Mock-Objekt zurück für die Verwendung im Test
+    for _ in range(anzahl_datensaetze):
+        daten = {
+            "ID": kompressor_id,
+            "Zeitstempel": aktuelle_zeit.strftime("%Y-%m-%d %H:%M:%S.%f"),
+            "Strom_gesamt": str(random.uniform(0.01, 0.05)),
+            "Spannung_gesamt": str(random.uniform(380, 420)),
+            "Wirkleistung_gesamt": str(random.uniform(5, 10)),
+            "Blindleistung_gesamt": str(random.uniform(0, 2)),
+            "Energie_gesamt_kwh": str(random.uniform(18000, 20000)),
+            "CosPhi_gesamt": str(random.uniform(0.1, 1.0)),
+            "Frequenz_gesamt": "50.0",
+            "Temperatur1": str(random.uniform(20, 25)),
+            "Temperatur2": str(random.uniform(130, 140)),
+            "Druck": str(random.uniform(0.7, 0.8)),
+            "Durchfluss": str(random.uniform(130, 140))
+        }
+        daten_liste.append({"Kompressor": kompressor_id, "Daten": daten})
 
-def test_hole_kompressor_daten(mock_kompressor_daten):
-    # Hier rufen wir die Funktion auf, die jetzt durch MagicMock simuliert wird
-    daten = hole_kompressor_daten()
-    # Wir überprüfen, ob die zurückgegebenen Daten unseren simulierten Daten entsprechen
-    assert daten == beispiel_kompressor_daten
+        # Zeit für den nächsten Datensatz aktualisieren
+        aktuelle_zeit -= intervall
 
+    return daten_liste
 
-import tkinter as tk
+# Startzeit festlegen (aktuelle Zeit)
+startzeit = datetime.now()
 
-# Vorhandene Beispielstruktur der Daten
-beispiel_kompressor_daten = {
-    "Kompressor_IPT_1": {
-        "ID": "12205254",
-        "Zeitstempel": "2023-11-10 11:56:27.410",
-        # Weitere Daten...
-    },
-    "Kompressor_IPT_2": {
-        "ID": "12205255",
-        "Zeitstempel": "2023-11-11 12:10:00.123",
-        # Weitere Daten...
-    }
-    # Weitere Kompressoren können hier hinzugefügt werden
-}
+# Daten für beide Kompressoren generieren
+kompressor_daten_1 = generiere_zufaellige_kompressor_daten("Kompressor_1", startzeit)
+kompressor_daten_2 = generiere_zufaellige_kompressor_daten("Kompressor_2", startzeit)
 
-
-def zeige_details(kompressor_id):
-    details_window = tk.Toplevel()
-    details_window.title(f"Details für {kompressor_id}")
-
-    daten = beispiel_kompressor_daten[kompressor_id]
-    for key, value in daten.items():
-        tk.Label(details_window, text=f"{key}: {value}").pack()
-
-
-# Hauptfenster Setup
-root = tk.Tk()
-root.title("Kompressor Auswahl")
-
-for kompressor_id in beispiel_kompressor_daten:
-    button = tk.Button(root, text=kompressor_id, command=lambda id=kompressor_id: zeige_details(id))
-    button.pack()
-
-root.mainloop()
+# Beispieldaten ausgeben
+print(kompressor_daten_1[:2])  # Die ersten zwei Datensätze von Kompressor 1

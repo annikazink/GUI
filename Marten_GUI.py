@@ -11,12 +11,12 @@ class SensorApp(tk.Tk):
         self.sensor_frames = []
 
         self.sensor_statuses = {
-            "Kompressor IPT": {
+            "Device 1": {
                 "Sensor 1": "OK",
                 "Sensor 2": "Warnung",
                 "Sensor 3": "Fehler"
             },
-            "Kompressor Ostfalia": {
+            "Device 2": {
                 "Sensor 1": "OK",
                 "Sensor 2": "OK",
                 "Sensor 3": "OK"
