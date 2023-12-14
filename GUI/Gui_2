@@ -1,0 +1,102 @@
+import tkinter as tk
+from tkinter import ttk
+
+class MainApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        # Setze den Vollbildmodus
+        self.attributes('-fullscreen', True)
+
+        # Notebook erstellen
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Tabs für Kompressor IPT und Kompressor Ostfalia
+        kompressor_ipt_frame = tk.Frame(self.notebook)
+        self.notebook.add(kompressor_ipt_frame, text="Kompressor IPT")
+
+        kompressor_ostfalia_frame = tk.Frame(self.notebook)
+        self.notebook.add(kompressor_ostfalia_frame, text="Kompressor Ostfalia")
+
+        # Schließen-Button
+        close_button = tk.Button(self, text="X", command=self.quit, font=("Arial", 12), width=2, height=1)
+        close_button.place(relx=1, rely=0, anchor=tk.NE)
+
+        # Knöpfe für Kompressor IPT
+        self.create_kompressor_ipt_buttons(kompressor_ipt_frame)
+
+        # Knöpfe für Kompressor Ostfalia
+        self.create_kompressor_ostfalia_buttons(kompressor_ostfalia_frame)
+
+        # Rahmen für Sensorstatus
+        self.sensor_status_frame = tk.Frame(self)
+        self.sensor_status_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        # Labels für Sensordaten
+        self.sensor_labels = {
+            "Druck": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Durchfluss": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Temperatur 1": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Temperatur 2": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Energieverbrauch": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Temperaturen": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Messwerte": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Systemdruck": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12)),
+            "Historische Daten": tk.Label(self.sensor_status_frame, text="", font=("Arial", 12))
+        }
+
+        # Sensordaten-Labels anzeigen
+        for idx, label in enumerate(self.sensor_labels.values()):
+            label.pack(padx=10, pady=5, anchor=tk.W)
+
+        # Dictionary für die Zuordnung von Knöpfen zu Daten
+        self.button_data = {
+            "Status Sensoren": {
+                "Druck": "0.74412 PSI",
+                "Durchfluss": "132.202 L/min",
+                "Temperatur 1": "23.898°C",
+                "Temperatur 2": "137.2°C"
+            },
+            "Energieverbrauch": {
+                "Energieverbrauch": "Verbrauch"
+            },
+            "Temperaturen": {
+                "Temperaturen": "133.2°C"
+            },
+            "Messwerte": {
+                "Messwerte": "665 PSI"
+            },
+            "Systemdruck": {
+                "Systemdruck": "Bar"
+            },
+            "Historische Daten_1": {
+                "Historische Daten": "13.12.2023"
+            },
+            "Historische Daten_2" :{
+                "Historische Daten": "14.12.2023"
+            }
+        }
+
+    def create_kompressor_ipt_buttons(self, frame):
+        for i, button_text in enumerate(["Status Sensoren", "Energieverbrauch", "Temperaturen", "Messwerte", "Systemdruck", "Historische Daten_1"]):
+            tk.Button(frame, text=button_text, font=("Arial", 12), width=20, height=3, command=lambda text=button_text: self.show_data(text)).grid(row=0, column=i, padx=10, pady=5)
+
+    def create_kompressor_ostfalia_buttons(self, frame):
+        for i, button_text in enumerate(["Energieverbrauch", "Messwerte", "Historische Daten_2"]):
+            tk.Button(frame, text=button_text, font=("Arial", 12), width=20, height=3, command=lambda text=button_text: self.show_data(text)).grid(row=0, column=i, padx=10, pady=5)
+
+    def show_data(self, button_text):
+        # Alle Labels leeren
+        for label in self.sensor_labels.values():
+            label["text"] = ""
+
+        # Daten für den ausgewählten Knopf anzeigen
+        data = self.button_data.get(button_text, {})
+        for key, value in data.items():
+            if key in self.sensor_labels:
+                self.sensor_labels[key]["text"] = f"{key}: {value}"
+
+if __name__ == "__main__":
+    app = MainApp()
+    app.mainloop()
