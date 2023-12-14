@@ -9,6 +9,7 @@ class MainApp(tk.Tk):
         self.notebook.pack(padx=10, pady=10)
 
         self.menu_frames = {}
+        self.current_menu_frame = None  # Aktuell geöffnetes Menü
         self.temperature_submenu = None  # Referenz auf das Untermenü "Temperatur"
         self.temperature_submenu_7days = None  # Referenz auf das Untermenü "7 Tage"
 
@@ -19,297 +20,197 @@ class MainApp(tk.Tk):
         kompressor_ipt_frame = tk.Frame(self.notebook)
         self.notebook.add(kompressor_ipt_frame, text="Kompressor IPT")
 
-        tk.Button(kompressor_ipt_frame, text="Status Sensoren", command=self.show_status_sensoren).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Energieverbrauch", command=self.show_energy_IPT_options).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Temperatur", command=self.create_temperature_submenu).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Messwerte", command=self.show_messwerte).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Systemdruck", command=self.show_systemdruck).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Historische Daten", command=self.show_historische_daten).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Kompressor", command=self.show_KompressorIPT_Kompressor).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Entluefter", command=self.show_KompressorIPT_Entluefter).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Kuehler", command=self.show_KompressorIPT_Kuehler).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Gesamt", command=self.show_KompressorIPT_Gesamt).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Historische Daten", command=self.show_KompressorIPT_HistorischeDaten).pack(pady=5, padx=10, side=tk.LEFT)
 
     def create_kompressor_ostfalia_page(self):
         kompressor_ostfalia_frame = tk.Frame(self.notebook)
         self.notebook.add(kompressor_ostfalia_frame, text="Kompressor Ostfalia")
 
-        tk.Button(kompressor_ostfalia_frame, text="Energieverbrauch", command=self.show_energy_options_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ostfalia_frame, text="Messwerte", command=self.show_messwerte_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ostfalia_frame, text="Historische Daten", command=self.show_historische_daten_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
-
-    def close_all_menus(self):
-        for frame in self.menu_frames.values():
-            frame.destroy()
-        self.menu_frames = {}
-
-    def show_status_sensoren(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
-
-        # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                padx=10,
-                                                                                                                side=tk.LEFT)
-
-    def show_energy_IPT_options(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        energy_options_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        energy_options_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["EnergyIPT"] = energy_options_frame  # Speichert den Frame im Dictionary
-
-        # Button für die 24-Stunden-Energieoption
-        tk.Button(energy_options_frame, text="24h", command=self.show_energy_IPT_24h).pack(pady=5, padx=10, side=tk.LEFT)
-
-        # Button für die 7-Tage-Energieoption
-        tk.Button(energy_options_frame, text="7 Tage", command=self.show_energy_IPT_7days).pack(pady=5, padx=10, side=tk.LEFT)
-
-        # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(energy_options_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5, padx=10, side=tk.LEFT)
-
-    def show_energy_IPT_24h(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Label(temperature_submenu_frame, text="Hier kommen noch Daten").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def show_energy_IPT_7days(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Label(temperature_submenu_frame, text="Hier kommen noch Daten").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-
-
-    def show_energy_options_ostfalia(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        energy_options_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        energy_options_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["EnergyOstfalia"] = energy_options_frame  # Speichert den Frame im Dictionary
-
-        # Button für die 24-Stunden-Energieoption
-        tk.Button(energy_options_frame, text="24h", command=self.show_energy_Ostfalia_24h).pack(pady=5, padx=10,
-                                                                                                side=tk.LEFT)
-
-        # Button für die 7-Tage-Energieoption
-        tk.Button(energy_options_frame, text="7 Tage", command=self.show_energy_Ostfalia_7days).pack(pady=5, padx=10,
-                                                                                                     side=tk.LEFT)
-
-        # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(energy_options_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                               padx=10,
-                                                                                                               side=tk.LEFT)
-
-    def show_energy_Ostfalia_24h(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Label(temperature_submenu_frame, text="Hier kommen noch Daten").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def show_energy_Ostfalia_7days(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Label(temperature_submenu_frame, text="Hier kommen noch Daten").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def create_temperature_submenu(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Button(temperature_submenu_frame, text="24h", command=self.show_temperature_24h).pack(pady=5, padx=10,
-                                                                                                 side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="7 Tage", command=self.show_7days_options).pack(pady=5, padx=10,
-                                                                                                  side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5, padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def show_temperature_24h(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Button(temperature_submenu_frame, text="Daten für 24 Stunden anzeigen",
-                  command=self.show_temperature_24h).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def show_7days_options(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Button(temperature_submenu_frame, text="Daten für 7 Tage anzeigen", command=self.show_7days_options).pack(
+        tk.Button(kompressor_ostfalia_frame, text="Energieverbrauch",
+                  command=self.show_KompressorOstfalia_Energieverbrauch).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Messwerte", command=self.show_KompressorOstfalia_Messwerte).pack(
             pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Historische Daten", command=self.show_KompressorOstfalia_HistorischeDaten).pack(
+            pady=5, padx=10, side=tk.LEFT)
 
-    def create_temperature_submenu_ostfalia(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
+    def close_current_menu(self):
+        if self.current_menu_frame:
+            self.current_menu_frame.destroy()
+            self.current_menu_frame = None
 
-        tk.Button(temperature_submenu_frame, text="24h", command=self.show_temperature_24h).pack(pady=5, padx=10,
+    def show_KompressorIPT_Kompressor(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        kompressordatenIPT_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        kompressordatenIPT_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        self.menu_frames[
+            "KompressordatenIPT"] = kompressordatenIPT_frame  # Aktualisiert den Frame-Schlüssel im Dictionary
+        self.current_menu_frame = kompressordatenIPT_frame  # Aktualisiert das aktuell geöffnete Menü
+
+        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
+        tk.Button(kompressordatenIPT_frame, text="Energie", command=self.plot_KompressorIPT_Kompressor_Energie).pack(pady=5,
+                                                                                                 padx=10,
                                                                                                  side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="7 Tage", command=self.create_temperature_submenu_ostfalia_7days).pack(pady=5,
-                                                                                                           padx=10,
-                                                                                                           side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def create_temperature_submenu_ostfalia_24h(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Button(temperature_submenu_frame, text="Daten für 24 Stunden anzeigen",
-                  command=self.show_temperature_24h).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def create_temperature_submenu_ostfalia_7days(self):
-        self.close_all_menus()
-        temperature_submenu_frame = tk.Frame(self)
-        temperature_submenu_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_submenu_frame
-        self.temperature_submenu = temperature_submenu_frame
-
-        tk.Button(temperature_submenu_frame, text="Daten für 7 Tage anzeigen",
-                  command=self.create_temperature_submenu_ostfalia_7days).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(pady=5,
-                                                                                                                 padx=10,
-                                                                                                                 side=tk.LEFT)
-
-    def show_messwerte(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
 
         # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-                pady=5,
-                padx=10,
-                side=tk.LEFT)
+        tk.Button(kompressordatenIPT_frame, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                                 padx=10,
+                                                                                                 side=tk.LEFT)
 
-    def show_messwerte_ostfalia(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
-
-        # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-            pady=5,
-            padx=10,
-            side=tk.LEFT)
-
-    def show_systemdruck(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
+    def show_KompressorIPT_Entluefter(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        entluefterIPT_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        entluefterIPT_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        EntluefterIPT = entluefterIPT_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = entluefterIPT_frame  # Aktualisiert das aktuell geöffnete Menü
 
         # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
+        tk.Button(EntluefterIPT, text="Energie", command=self.plot_KompressorIPT_Entluefter_Energie).pack(pady=5,
+                                                                                      padx=10,
+                                                                                      side=tk.LEFT)
 
         # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-            pady=5,
-            padx=10,
-            side=tk.LEFT)
+        tk.Button(EntluefterIPT, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                     padx=10,
+                                                                                     side=tk.LEFT)
 
-    def show_systemdruck_ostfalia(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
+    def show_KompressorIPT_Kuehler(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        kuehlerIPT_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        kuehlerIPT_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        KuehlerIPT = kuehlerIPT_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = kuehlerIPT_frame  # Aktualisiert das aktuell geöffnete Menü
 
         # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-            pady=5,
-            padx=10,
-            side=tk.LEFT)
-
-
-    def show_historische_daten(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
+        tk.Button(KuehlerIPT, text="Energie", command=self.plot_KompressorIPT_Kuehler_Energie).pack(pady=5,
+                                                                                   padx=10,
+                                                                                   side=tk.LEFT)
 
         # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-            pady=5,
-            padx=10,
-            side=tk.LEFT)
+        tk.Button(KuehlerIPT, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                  padx=10,
+                                                                                  side=tk.LEFT)
 
-
-    def show_historische_daten_ostfalia(self):
-        self.close_all_menus()  # Schließt alle geöffneten Menüs
-        status_sensoren_frame = tk.Frame(self)  # Erstellt einen neuen Frame
-        status_sensoren_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
-        self.menu_frames["StatusSensoren"] = status_sensoren_frame  # Speichert den Frame im Dictionary
-
-        # Label, das anzeigt, dass aktuell keine Daten verfügbar sind
-        tk.Label(status_sensoren_frame, text="Aktuell keine Daten verfügbar.").pack(pady=5, padx=10)
+    def show_KompressorIPT_Gesamt(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        gesamtIPT_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        gesamtIPT_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        GesamtIPT = gesamtIPT_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = gesamtIPT_frame  # Aktualisiert das aktuell geöffnete Menü
 
         # Button, um zum Hauptmenü zurückzukehren
-        tk.Button(status_sensoren_frame, text="Zurück", command=lambda: self.close_all_menus()).pack(
-            pady=5,
-            padx=10,
-            side=tk.LEFT)
+        tk.Button(GesamtIPT, text="Druck", command=self.plot_KompressorIPT_Gesamt_Druck).pack(pady=5,
+                                                                                  padx=10,
+                                                                                  side=tk.LEFT)
+
+        tk.Button(GesamtIPT, text="Durchfluss", command=self.plot_KompressorIPT_Gesamt_Durchfluss).pack(pady=5,
+                                                                                              padx=10,
+                                                                                              side=tk.LEFT)
+
+        tk.Button(GesamtIPT, text="Temperatur", command=self.plot_KompressorIPT_Gesamt_Temperatur).pack(pady=5,
+                                                                                                        padx=10,
+                                                                                                        side=tk.LEFT)
+
+        tk.Button(GesamtIPT, text="Energie", command=self.plot_KompressorIPT_Gesamt_Energie).pack(pady=5,
+                                                                                                        padx=10,
+                                                                                                        side=tk.LEFT)
+
+        # Button, um zum Hauptmenü zurückzukehren
+        tk.Button(GesamtIPT, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                   padx=10,
+                                                                                   side=tk.LEFT)
+
+    def show_KompressorIPT_HistorischeDaten(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        historischeDatenIPT_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        historischeDatenIPT_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        HistorischeDatenIPT = historischeDatenIPT_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = historischeDatenIPT_frame  # Aktualisiert das aktuell geöffnete Menü
+
+        # Label, das anzeigt, dass aktuell keine historischen Daten verfügbar sind
+        tk.Label(HistorischeDatenIPT, text="Aktuell keine historischen Daten verfügbar.").pack(pady=5, padx=10)
+
+        # Button, um zum Hauptmenü zurückzukehren
+        tk.Button(HistorischeDatenIPT, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                           padx=10,
+                                                                                           side=tk.LEFT)
+
+    def show_KompressorOstfalia_Energieverbrauch(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        energieverbrauchOstfalia_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        energieverbrauchOstfalia_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        EnergieverbrauchOstfalia = energieverbrauchOstfalia_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = energieverbrauchOstfalia_frame  # Aktualisiert das aktuell geöffnete Menü
+
+        # Label, das den Energieverbrauch anzeigt
+        tk.Label(EnergieverbrauchOstfalia, text="Energieverbrauch: [Hier Energieverbrauch einfügen]").pack(pady=5,
+                                                                                                           padx=10)
+
+        # Button, um zum Hauptmenü zurückzukehren
+        tk.Button(EnergieverbrauchOstfalia, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                                  padx=10,
+                                                                                                  side=tk.LEFT)
+
+    def show_KompressorOstfalia_Messwerte(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        messwerteOstfalia_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        messwerteOstfalia_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        MesswerteOstfalia = messwerteOstfalia_frame  # Aktualisiert die Variable auf den neuen Frame
+        self.current_menu_frame = messwerteOstfalia_frame  # Aktualisiert das aktuell geöffnete Menü
+
+        # Label, das die Messwerte anzeigt
+        tk.Label(MesswerteOstfalia, text="Messwerte: [Hier Messwerte einfügen]").pack(pady=5, padx=10)
+
+        # Button, um zum Hauptmenü zurückzukehren
+        tk.Button(MesswerteOstfalia, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                         padx=10,
+                                                                                         side=tk.LEFT)
+
+    def show_KompressorOstfalia_HistorischeDaten(self):
+        self.close_current_menu()  # Schließt das aktuell geöffnete Menü
+        historischeDatenOstfalia_frame = tk.Frame(self)  # Erstellt einen neuen Frame
+        historischeDatenOstfalia_frame.pack(padx=10, pady=10)  # Platziert den Frame im Hauptfenster
+        self.menu_frames[
+            "HistorischeDatenOstfalia"] = historischeDatenOstfalia_frame  # Aktualisiert den Frame-Schlüssel im Dictionary
+        self.current_menu_frame = historischeDatenOstfalia_frame  # Aktualisiert das aktuell geöffnete Menü
+
+        # Hier kannst du deine historischen Daten anzeigen, z.B. in einem Text-Widget
+        historische_daten_label = tk.Label(historischeDatenOstfalia_frame, text="Historische Daten anzeigen:")
+        historische_daten_label.pack(pady=5, padx=10)
+
+        historische_daten_text = tk.Text(historischeDatenOstfalia_frame, width=40, height=10)
+        historische_daten_text.pack(pady=5, padx=10)
+
+        historische_daten_text.insert(tk.END, "Hier werden die historischen Daten angezeigt.")
+
+        # Button, um zum Hauptmenü zurückzukehren
+        tk.Button(historischeDatenOstfalia_frame, text="Zurück", command=self.close_current_menu).pack(pady=5,
+                                                                                                       padx=10,
+                                                                                                       side=tk.LEFT)
+
+    def plot_KompressorIPT_Kompressor_Energie(self):
+        pass
+
+    def plot_KompressorIPT_Entluefter_Energie(self):
+        pass
+
+    def plot_KompressorIPT_Kuehler_Energie(self):
+        pass
+
+    def plot_KompressorIPT_Gesamt_Druck(self):
+        pass
+
+    def plot_KompressorIPT_Gesamt_Durchfluss(self):
+        pass
+
+    def plot_KompressorIPT_Gesamt_Temperatur(self):
+        pass
+
+    def plot_KompressorIPT_Gesamt_Energie(self):
+        pass
 
 if __name__ == "__main__":
     app = MainApp()

@@ -1,42 +1,63 @@
-import random
-from datetime import datetime, timedelta
+from unittest.mock import MagicMock
 
-def generiere_zufaellige_kompressor_daten(kompressor_id, startzeit, intervall_in_minuten=15):
-    daten_liste = []
-    aktuelle_zeit = startzeit
+# Erstellen einer simulierten Datenbankverbindung
+mock_db = MagicMock()
 
-    intervall = timedelta(minutes=intervall_in_minuten)
-    anzahl_datensaetze = int(7 * 24 * 60 / intervall_in_minuten)  # Anzahl der Datenpunkte für 7 Tage
+# Simulieren der Verbindungsherstellung
+mock_db.connect.return_value = "Verbindung erfolgreich"
 
-    for _ in range(anzahl_datensaetze):
-        daten = {
-            "ID": kompressor_id,
-            "Zeitstempel": aktuelle_zeit.strftime("%Y-%m-%d %H:%M:%S.%f"),
-            "Strom_gesamt": str(random.uniform(0.01, 0.05)),
-            "Spannung_gesamt": str(random.uniform(380, 420)),
-            "Wirkleistung_gesamt": str(random.uniform(5, 10)),
-            "Blindleistung_gesamt": str(random.uniform(0, 2)),
-            "Energie_gesamt_kwh": str(random.uniform(18000, 20000)),
-            "CosPhi_gesamt": str(random.uniform(0.1, 1.0)),
-            "Frequenz_gesamt": "50.0",
-            "Temperatur1": str(random.uniform(20, 25)),
-            "Temperatur2": str(random.uniform(130, 140)),
-            "Druck": str(random.uniform(0.7, 0.8)),
-            "Durchfluss": str(random.uniform(130, 140))
-        }
-        daten_liste.append({"Kompressor": kompressor_id, "Daten": daten})
+# Simulieren eines Cursors
+cursor = MagicMock()
+mock_db.cursor.return_value = cursor
 
-        # Zeit für den nächsten Datensatz aktualisieren
-        aktuelle_zeit -= intervall
+# Simulieren der 'execute' Methode
+cursor.execute.return_value = None
 
-    return daten_liste
+# Simulieren der 'fetchall' Methode für spezifische Daten
+simulated_data = {
+  "Kompressor_IPT": [
+    {
+      "ID": "12205254",
+      "Zeitstempel": "2023-11-10 11:56:27.410",
+      "Energie gesamt": "18988.191285"
+    }
+  ],
+  "Kompressor_IPT_Entlueftung": [
+    {
+      "ID": "12203203",
+      "Zeitstempel": "2023-11-10 11:56:27.390",
+      "Energie gesamt": "36.17966"
+    }
+  ],
+  "Kompressor_IPT_Kuehler": [
+    {
+      "ID": "12203200",
+      "Zeitstempel": "2023-11-10 11:56:27.400",
+      "Energie gesamt": "1008.193971"
+    }
+  ],
+  "Kompressor_IPT_Sensoren": [
+    {
+      "Zeitstempel": "2023-11-10 11:56:27.380",
+      "Druck": "7.04412",
+      "Durchfluss": "132.202",
+      "Temperatur1": "23.898",
+      "Temperatur2": "1372"
+    }
+  ],
+  "Kompressor_Ostfalia": [
+    {
+      "ID": "12205255",
+      "Zeitstempel": "2023-11-10 11:56:27.310",
+      "Energie gesamt": "11108.303394999999"
+    }
+  ]
+}
 
-# Startzeit festlegen (aktuelle Zeit)
-startzeit = datetime.now()
 
-# Daten für beide Kompressoren generieren
-kompressor_daten_1 = generiere_zufaellige_kompressor_daten("Kompressor_1", startzeit)
-kompressor_daten_2 = generiere_zufaellige_kompressor_daten("Kompressor_2", startzeit)
+cursor.fetchall.return_value = simulated_data
 
-# Beispieldaten ausgeben
-print(kompressor_daten_1[:2])  # Die ersten zwei Datensätze von Kompressor 1
+# Beispiel für die Verwendung
+print(mock_db.connect())  # Gibt "Verbindung erfolgreich" zurück
+cursor.execute("SELECT * FROM kompressoren")
+print(cursor.fetchall())  # Gibt simulierte Daten zurück
