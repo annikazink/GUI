@@ -130,8 +130,13 @@ class MainApp(tk.Tk):
             frame, text="Historische Daten", font=("Arial", 12), width=20, height=3
         ).grid(row=0, column=2, padx=10, pady=5)
 
+
 import tkinter as tk
 from tkinter import ttk
+import sqlite3
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -141,6 +146,8 @@ class MainApp(tk.Tk):
         self.notebook.pack(padx=10, pady=10)
 
         self.menu_frames = {}
+        self.temperature_submenu = None  # Referenz auf das Untermenü "Temperatur"
+        self.temperature_submenu_7days = None  # Referenz auf das Untermenü "7 Tage"
 
         self.create_kompressor_ipt_page()
         self.create_kompressor_ostfalia_page()
@@ -149,36 +156,29 @@ class MainApp(tk.Tk):
         kompressor_ipt_frame = tk.Frame(self.notebook)
         self.notebook.add(kompressor_ipt_frame, text="Kompressor IPT")
 
-        tk.Button(kompressor_ipt_frame, text="Status Sensoren").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Status Sensoren", command=self.show_status_sensoren).pack(pady=5, padx=10, side=tk.LEFT)
         tk.Button(kompressor_ipt_frame, text="Energieverbrauch", command=self.show_energy_options).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Temperatur", command=self.show_temperature_options).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Messwerte").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Systemdruck").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ipt_frame, text="Historische Daten").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Temperatur", command=self.create_temperature_submenu).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Messwerte", command=self.show_messwerte).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Systemdruck", command=self.show_systemdruck).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ipt_frame, text="Historische Daten", command=self.show_historische_daten).pack(pady=5, padx=10, side=tk.LEFT)
 
     def create_kompressor_ostfalia_page(self):
         kompressor_ostfalia_frame = tk.Frame(self.notebook)
         self.notebook.add(kompressor_ostfalia_frame, text="Kompressor Ostfalia")
 
-        tk.Button(kompressor_ostfalia_frame, text="Energieverbräuche", command=self.show_energy_options).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ostfalia_frame, text="Messwerte").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ostfalia_frame, text="Temperatur", command=self.show_temperature_options).pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(kompressor_ostfalia_frame, text="Historische Daten").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Energieverbrauch", command=self.show_energy_options_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Messwerte", command=self.show_messwerte_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(kompressor_ostfalia_frame, text="Historische Daten", command=self.show_historische_daten_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
 
     def close_all_menus(self):
         for frame in self.menu_frames.values():
             frame.destroy()
         self.menu_frames = {}
 
-    def show_temperature_options(self):
+    def show_status_sensoren(self):
         self.close_all_menus()
-        temperature_options_frame = tk.Frame(self)
-        temperature_options_frame.pack(padx=10, pady=10)
-        self.menu_frames["Temperature"] = temperature_options_frame
-
-        tk.Button(temperature_options_frame, text="7 Tage").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_options_frame, text="24h").pack(pady=5, padx=10, side=tk.LEFT)
-        tk.Button(temperature_options_frame, text="Zurück", command=lambda: self.close_menu("Temperature")).pack(pady=5, padx=10, side=tk.LEFT)
+        # Implementiere die Funktion für "Status Sensoren" hier
 
     def show_energy_options(self):
         self.close_all_menus()
@@ -186,15 +186,127 @@ class MainApp(tk.Tk):
         energy_options_frame.pack(padx=10, pady=10)
         self.menu_frames["Energy"] = energy_options_frame
 
-        tk.Button(energy_options_frame, text="7 Tage").pack(pady=5, padx=10, side=tk.LEFT)
         tk.Button(energy_options_frame, text="24h").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(energy_options_frame, text="7 Tage", command=self.show_7days_options).pack(pady=5, padx=10, side=tk.LEFT)
         tk.Button(energy_options_frame, text="Zurück", command=lambda: self.close_menu("Energy")).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def show_energy_options_ostfalia(self):
+        self.close_all_menus()
+        energy_options_frame = tk.Frame(self)
+        energy_options_frame.pack(padx=10, pady=10)
+        self.menu_frames["Energy"] = energy_options_frame
+
+        tk.Button(energy_options_frame, text="24h").pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(energy_options_frame, text="7 Tage", command=self.show_7days_options_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(energy_options_frame, text="Zurück", command=lambda: self.close_menu("Energy")).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def create_temperature_submenu(self):
+        self.close_all_menus()
+        temperature_submenu_frame = tk.Frame(self)
+        temperature_submenu_frame.pack(padx=10, pady=10)
+        self.menu_frames["Temperature"] = temperature_submenu_frame
+        self.temperature_submenu = temperature_submenu_frame
+
+        tk.Button(temperature_submenu_frame, text="24h", command=self.show_temperature_24h).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(temperature_submenu_frame, text="7 Tage", command=self.show_7days_options).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_menu("Temperature")).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def create_temperature_submenu_ostfalia(self):
+        self.close_all_menus()
+        temperature_submenu_frame = tk.Frame(self)
+        temperature_submenu_frame.pack(padx=10, pady=10)
+        self.menu_frames["Temperature"] = temperature_submenu_frame
+        self.temperature_submenu = temperature_submenu_frame
+
+        tk.Button(temperature_submenu_frame, text="24h", command=self.show_temperature_24h).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(temperature_submenu_frame, text="7 Tage", command=self.show_7days_options_ostfalia).pack(pady=5, padx=10, side=tk.LEFT)
+        tk.Button(temperature_submenu_frame, text="Zurück", command=lambda: self.close_menu("Temperature")).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def show_messwerte(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Messwerte" hier
+
+    def show_messwerte_ostfalia(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Messwerte" auf "Kompressor Ostfalia" hier
+
+    def show_systemdruck(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Systemdruck" hier
+
+    def show_systemdruck_ostfalia(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Systemdruck" auf "Kompressor Ostfalia" hier
+
+    def show_historische_daten(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Historische Daten" hier
+
+    def show_historische_daten_ostfalia(self):
+        self.close_all_menus()
+        # Implementiere die Funktion für "Historische Daten" auf "Kompressor Ostfalia" hier
+
+    def show_7days_options(self):
+        if self.temperature_submenu is not None:
+            self.close_menu("Temperature")
+            temperature_7days_submenu_frame = tk.Frame(self)
+            temperature_7days_submenu_frame.pack(padx=10, pady=10)
+            self.menu_frames["Temperature7Days"] = temperature_7days_submenu_frame
+            self.temperature_submenu_7days = temperature_7days_submenu_frame
+
+            tk.Button(temperature_7days_submenu_frame, text="Zurück", command=self.close_temperature_7days_submenu).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def show_7days_options_ostfalia(self):
+        if self.temperature_submenu is not None:
+            self.close_menu("Temperature")
+            temperature_7days_submenu_frame = tk.Frame(self)
+            temperature_7days_submenu_frame.pack(padx=10, pady=10)
+            self.menu_frames["Temperature7Days"] = temperature_7days_submenu_frame
+            self.temperature_submenu_7days = temperature_7days_submenu_frame
+
+            tk.Button(temperature_7days_submenu_frame, text="Zurück", command=self.close_temperature_7days_submenu).pack(pady=5, padx=10, side=tk.LEFT)
+
+    def close_temperature_7days_submenu(self):
+        if self.temperature_submenu_7days is not None:
+            self.temperature_submenu_7days.destroy()
+            del self.menu_frames["Temperature7Days"]
+
+    def show_temperature_24h(self):
+        if self.temperature_submenu is not None:
+            self.close_menu("Temperature")
+            conn = sqlite3.connect("deine_datenbank.db")  # Passe den Datenbanknamen an
+            query = """
+                SELECT Zeitstempel, Temperatur1, Temperatur2
+                FROM deine_tabelle
+                WHERE Zeitstempel >= DATETIME('now', '-1 day')
+                """
+            df = pd.read_sql_query(query, conn)
+
+            if not df.empty:
+                df['Zeitstempel'] = pd.to_datetime(df['Zeitstempel'])
+                df.set_index('Zeitstempel', inplace=True)
+                df = df.resample('H').mean()
+
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+
+                plt.plot(df.index, df['Temperatur1'], label='Temperatur1')
+                plt.plot(df.index, df['Temperatur2'], label='Temperatur2')
+                plt.xlabel('Zeit')
+                plt.ylabel('Temperatur')
+                plt.title('Temperatur in den letzten 24 Stunden')
+                plt.legend()
+                plt.grid(True)
+                plt.tight_layout()
+
+                plt.show()
+
+            conn.close()
 
     def close_menu(self, menu_name):
         if menu_name in self.menu_frames:
             self.menu_frames[menu_name].destroy()
             del self.menu_frames[menu_name]
-
 
 if __name__ == "__main__":
     app = MainApp()
